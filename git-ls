@@ -1,0 +1,27 @@
+#!/bin/bash
+
+any_output=no
+
+function iterate {
+  output=$(cd "$1"; git status --short 2>&1)
+  if test -n "$output"; then
+    test $any_output = yes && echo
+    echo "$1":
+    echo "$output"
+    any_output=yes
+  fi
+}
+
+test $# = 0 && set .
+
+if test $# = 1; then
+  cd "$1"; git status
+else
+  for repository in "$@"; do
+    iterate "$repository"
+  done
+
+  if test $any_output = no; then
+    echo "nothing to commit, $# working directories clean"
+  fi
+fi
