@@ -22,6 +22,6 @@ else
   done
 
   if test $any_output = no; then
-    echo "$# repositories clean"
+    echo "$# clean repositories"
   fi
 fi
