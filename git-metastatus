@@ -1,27 +1,28 @@
 #!/bin/bash
 
-any_output=no
+test $# = 0 && set -- ..
+test $# = 1 && set -- "$1"/*
 
-function iterate {
-  output=$(cd "$1"; git status -b --short 2>&1)
-  if egrep -qv '^## \S+$' <<< "$output"; then
-    test $any_output = yes && echo
-    echo "$1":
-    echo "$output"
-    any_output=yes
-  fi
+function main {
+  for directory in "$@"; do examine "$directory"; done
+  any-output || echo "$# clean repositories"
 }
 
-test $# = 0 && set .
+function examine {
+  status=`get-status "$1"`
+  is-interesting "$status" && {
+    print-status "$1" "$status"
+  }
+}
 
-if test $# = 1; then
-  cd "$1"; git status
-else
-  for repository in "$@"; do
-    iterate "$repository"
-  done
+function get-status { (cd "$1"; git status -b --short 2>&1); }
+function is-interesting { echo "$1" | grep -qv '^## [^ ]+$'; }
 
-  if test $any_output = no; then
-    echo "$# clean repositories"
-  fi
-fi
+function any-output { test -n "$any_output"; }
+function print-status {
+  any-output && echo || any_output=yes
+  echo "$1:"
+  echo "$2"
+}
+
+main "$@"
