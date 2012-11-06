@@ -15,8 +15,8 @@ function examine {
   }
 }
 
-function get-status { (cd "$1"; git status -b --short 2>&1); }
-function is-interesting { echo "$1" | grep -qv '^## [^ ]+$'; }
+function get-status { (cd "$1" && git status -b --short 2>&1); }
+function is-interesting { echo "$1" | grep -qv -E '^## [^ ]+$'; }
 
 function any-output { test -n "$any_output"; }
 function print-status {
